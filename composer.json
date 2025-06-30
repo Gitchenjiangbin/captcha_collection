@@ -1,0 +1,23 @@
+{
+    "name": "chenjiangbin/captcha",
+    "description": "验证码",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Chenjiangbin\\CaptchaPuzzle\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "chenjiangbin",
+            "email": "1039274265@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.4",
+        "ext-redis": "*"
+    }
+}

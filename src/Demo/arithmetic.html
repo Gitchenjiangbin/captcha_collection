@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>加减乘除验证码</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        #code {
+            height: 40px;
+            width: 80px;
+            vertical-align: middle;
+        }
+
+        #captcha {
+            vertical-align: middle;
+            height: 40px; /* 可根据需要设置 */
+        }
+
+        #captcha:hover {
+            cursor: pointer;
+        }
+
+        #submit {
+            height: 30px;
+            width: 80px;
+            margin-top: 50px;
+        }
+
+    </style>
+</head>
+<body>
+<h2>加减乘除验证码：</h2>
+<div id="container">
+    <form id="form">
+        <input type="text" id="code" name="code"/>
+        <img src="" id="captcha" alt="验证码图片" title="点击刷新验证码">
+        <div>
+            <button type="submit" id="submit">提交</button>
+        </div>
+    </form>
+</div>
+
+<script>
+
+    let captcha = document.getElementById('captcha')
+    let cache_id = '';
+
+    getSrc();
+    captcha.addEventListener('click', function () {
+        getSrc();
+    })
+
+    function getSrc() {
+        // 初始化验证码
+        fetch('arithmetic.php')
+            .then(res => res.json())
+            .then(data => {
+                console.log("data", data)
+                cache_id = data.cache_id
+                captcha.src = data.src;
+            })
+    }
+
+
+    // 提交表单时阻止默认刷新并处理逻辑
+    document.getElementById('form').addEventListener('submit', function (e) {
+        e.preventDefault(); // 阻止默认提交行为
+
+        const code = document.getElementById('code').value;
+
+        // 示例：用 fetch 提交到服务器
+        fetch('arithmetic.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                code: code,
+                cache_id: cache_id
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                if (data.code == 0) {
+                    alert('❌ ' + data.error)
+                    getSrc()
+                } else {
+                    alert('✅ 验证成功！')
+                }
+            });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>语音验证码</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        #code {
+            height: 40px;
+            width: 80px;
+            vertical-align: middle;
+        }
+
+        #play-btn {
+            margin-left: 10px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #submit {
+            height: 30px;
+            width: 80px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h2>语音验证码：</h2>
+<div id="container">
+    <form id="form">
+        <input type="text" id="code" name="code" placeholder="请输入验证码"/>
+        <button type="button" id="play-btn">🔊 播放验证码</button>
+
+        <div>
+            <button type="submit" id="submit">提交</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    let audio = null;
+    let cache_id = '';
+
+    // 初始化验证码语音
+    getSrc();
+
+    document.getElementById('play-btn').addEventListener('click', function () {
+        if (audio) {
+            audio.play().catch(err => console.error('播放失败:', err));
+        }
+    });
+
+    function getSrc() {
+        fetch('voice.php')
+            .then(res => res.json())
+            .then(data => {
+                console.log("data", data);
+                cache_id = data.cache_id;
+
+                // 创建新的 Audio 实例
+                audio = new Audio(data.src);
+                audio.load(); // 预加载
+            });
+    }
+
+    // 表单提交验证
+    document.getElementById('form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const code = document.getElementById('code').value;
+
+        fetch('voice.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                code: code,
+                cache_id: cache_id
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code == 0) {
+                    alert('❌ ' + data.error);
+                    getSrc(); // 重新加载验证码
+                } else {
+                    alert('✅ 验证成功！');
+                }
+            });
+    });
+</script>
+</body>
+</html>
