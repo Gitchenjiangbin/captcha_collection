@@ -125,7 +125,11 @@ php -S localhost:8001
 ---
 
 ## 语音验证码
-
+注： 需要先安装 espeak-ng
+```shell script
+sudo apt update
+sudo apt install espeak-ng
+```
 ### 请求参数
 
 | 字段          | 类型     | 是否必填 | 描述                         |
